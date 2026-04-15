@@ -1,5 +1,8 @@
+import { Card, Typography, InputNumber, Input, Select, Form } from '@douyinfe/semi-ui'
 import { useCanvasStore } from '../../store/canvasStore'
 import './Panel.css'
+
+const { Title, Text } = Typography
 
 export function PropertyPanel() {
   const { elements, selectedIds, updateElement, setElementData } = useCanvasStore()
@@ -8,16 +11,15 @@ export function PropertyPanel() {
   
   if (selectedElements.length === 0) {
     return (
-      <div className="property-panel empty">
-        <div className="panel-header">
-          <span>属性面板</span>
-          <span className="panel-subtitle">Property Panel</span>
-        </div>
-        <div className="panel-content">
-          <p className="empty-text">选择一个元素以编辑属性</p>
-          <p className="empty-subtext">Select an element to edit properties</p>
-        </div>
-      </div>
+      <Card className="property-panel-empty" bodyStyle={{ padding: 24 }}>
+        <Title heading={6}>属性面板</Title>
+        <Text type="tertiary" style={{ display: 'block', marginTop: 8 }}>
+          选择一个元素以编辑属性
+        </Text>
+        <Text type="tertiary" size="small">
+          Select an element to edit properties
+        </Text>
+      </Card>
     )
   }
   
@@ -35,184 +37,160 @@ export function PropertyPanel() {
     setElementData(element.id, { ...element.data, [key]: value })
   }
   
+  const chartTypeOptions = [
+    { value: 'bar', label: 'Bar Chart' },
+    { value: 'line', label: 'Line Chart' },
+    { value: 'pie', label: 'Pie Chart' },
+    { value: 'scatter', label: 'Scatter Chart' },
+    { value: 'area', label: 'Area Chart' },
+  ]
+
   return (
-    <div className="property-panel">
-      <div className="panel-header">
-        <span>属性面板</span>
-        <span className="panel-subtitle">Property Panel</span>
+    <Card className="property-panel" bodyStyle={{ padding: 0 }}>
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--semi-color-border)' }}>
+        <Title heading={6} style={{ margin: 0 }}>属性面板</Title>
+        <Text type="tertiary" size="small">Property Panel</Text>
       </div>
       
-      <div className="panel-content">
-        {/* Element Type */}
-        <div className="property-section">
-          <div className="section-title">元素类型 / Element Type</div>
-          <div className="property-row">
-            <span className="property-label">Type</span>
-            <span className="property-value type-badge">{element.type}</span>
-          </div>
-        </div>
-        
-        {/* Position */}
-        <div className="property-section">
-          <div className="section-title">位置 / Position</div>
-          <div className="property-row">
-            <label className="property-label">X</label>
-            <input
-              type="number"
-              value={Math.round(element.x)}
-              onChange={(e) => handlePositionChange('x', Number(e.target.value))}
-              className="property-input"
-            />
-          </div>
-          <div className="property-row">
-            <label className="property-label">Y</label>
-            <input
-              type="number"
-              value={Math.round(element.y)}
-              onChange={(e) => handlePositionChange('y', Number(e.target.value))}
-              className="property-input"
-            />
-          </div>
-        </div>
-        
-        {/* Size */}
-        <div className="property-section">
-          <div className="section-title">尺寸 / Size</div>
-          <div className="property-row">
-            <label className="property-label">Width</label>
-            <input
-              type="number"
-              value={Math.round(element.width)}
-              onChange={(e) => handleSizeChange('width', Number(e.target.value))}
-              className="property-input"
-            />
-          </div>
-          <div className="property-row">
-            <label className="property-label">Height</label>
-            <input
-              type="number"
-              value={Math.round(element.height)}
-              onChange={(e) => handleSizeChange('height', Number(e.target.value))}
-              className="property-input"
-            />
-          </div>
-        </div>
-        
-        {/* Rotation */}
-        <div className="property-section">
-          <div className="section-title">旋转 / Rotation</div>
-          <div className="property-row">
-            <label className="property-label">Angle</label>
-            <input
-              type="number"
-              value={Math.round(element.rotation || 0)}
-              onChange={(e) => updateElement(element.id, { rotation: Number(e.target.value) })}
-              className="property-input"
-            />
-          </div>
-        </div>
-        
-        {/* Chart-specific properties */}
-        {element.type === 'chart' && element.data.spec && (
-          <div className="property-section">
-            <div className="section-title">图表配置 / Chart Config</div>
-            <div className="property-row">
-              <label className="property-label">Chart Type</label>
-              <select
+      <div style={{ padding: 16 }}>
+        <Form layout="vertical">
+          {/* Element Type */}
+          <Form.Section text="元素类型 / Element Type">
+            <Form.Label style={{ marginBottom: 8 }}>Type</Form.Label>
+            <Text type="primary" strong style={{ 
+              display: 'inline-block', 
+              padding: '4px 12px', 
+              background: 'var(--semi-color-primary-light-default)',
+              borderRadius: 4,
+              color: 'var(--semi-color-primary)',
+              textTransform: 'uppercase',
+              fontSize: 12
+            }}>
+              {element.type}
+            </Text>
+          </Form.Section>
+          
+          {/* Position */}
+          <Form.Section text="位置 / Position">
+            <div style={{ display: 'flex', gap: 12 }}>
+              <Form.Label>X</Form.Label>
+              <InputNumber
+                value={Math.round(element.x)}
+                onChange={(value) => handlePositionChange('x', Number(value))}
+                style={{ flex: 1 }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+              <Form.Label>Y</Form.Label>
+              <InputNumber
+                value={Math.round(element.y)}
+                onChange={(value) => handlePositionChange('y', Number(value))}
+                style={{ flex: 1 }}
+              />
+            </div>
+          </Form.Section>
+          
+          {/* Size */}
+          <Form.Section text="尺寸 / Size">
+            <div style={{ display: 'flex', gap: 12 }}>
+              <Form.Label>Width</Form.Label>
+              <InputNumber
+                value={Math.round(element.width)}
+                onChange={(value) => handleSizeChange('width', Number(value))}
+                style={{ flex: 1 }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+              <Form.Label>Height</Form.Label>
+              <InputNumber
+                value={Math.round(element.height)}
+                onChange={(value) => handleSizeChange('height', Number(value))}
+                style={{ flex: 1 }}
+              />
+            </div>
+          </Form.Section>
+          
+          {/* Rotation */}
+          <Form.Section text="旋转 / Rotation">
+            <div style={{ display: 'flex', gap: 12 }}>
+              <Form.Label>Angle</Form.Label>
+              <InputNumber
+                value={Math.round(element.rotation || 0)}
+                onChange={(value) => updateElement(element.id, { rotation: Number(value) })}
+                style={{ flex: 1 }}
+              />
+            </div>
+          </Form.Section>
+          
+          {/* Chart-specific properties */}
+          {element.type === 'chart' && element.data.spec && (
+            <Form.Section text="图表配置 / Chart Config">
+              <Form.Label>Chart Type</Form.Label>
+              <Select
                 value={element.data.spec.type || 'bar'}
-                onChange={(e) => handleDataChange('spec', { ...element.data.spec, type: e.target.value })}
-                className="property-select"
-              >
-                <option value="bar">Bar Chart</option>
-                <option value="line">Line Chart</option>
-                <option value="pie">Pie Chart</option>
-                <option value="scatter">Scatter Chart</option>
-                <option value="area">Area Chart</option>
-              </select>
-            </div>
-            <div className="property-row">
-              <label className="property-label">Title</label>
-              <input
-                type="text"
+                onChange={(value) => handleDataChange('spec', { ...element.data.spec, type: value })}
+                optionList={chartTypeOptions}
+                style={{ width: '100%', marginBottom: 12 }}
+              />
+              <Form.Label>Title</Form.Label>
+              <Input
                 value={element.data.spec.title?.text || ''}
-                onChange={(e) => handleDataChange('spec', { 
+                onChange={(value) => handleDataChange('spec', { 
                   ...element.data.spec, 
-                  title: { ...element.data.spec.title, text: e.target.value }
+                  title: { ...element.data.spec.title, text: value }
                 })}
-                className="property-input"
               />
-            </div>
-          </div>
-        )}
-        
-        {/* Text-specific properties */}
-        {element.type === 'text' && (
-          <div className="property-section">
-            <div className="section-title">文本配置 / Text Config</div>
-            <div className="property-row">
-              <label className="property-label">Content</label>
-              <textarea
+            </Form.Section>
+          )}
+          
+          {/* Text-specific properties */}
+          {element.type === 'text' && (
+            <Form.Section text="文本配置 / Text Config">
+              <Form.Label>Content</Form.Label>
+              <Input
                 value={element.data.text || ''}
-                onChange={(e) => handleDataChange('text', e.target.value)}
-                className="property-textarea"
-                rows={3}
+                onChange={(value) => handleDataChange('text', value)}
+                style={{ marginBottom: 12 }}
               />
-            </div>
-            <div className="property-row">
-              <label className="property-label">Font Size</label>
-              <input
-                type="text"
+              <Form.Label>Font Size</Form.Label>
+              <Input
                 value={element.data.style?.fontSize || '16px'}
-                onChange={(e) => handleDataChange('style', { ...element.data.style, fontSize: e.target.value })}
-                className="property-input"
+                onChange={(value) => handleDataChange('style', { ...element.data.style, fontSize: value })}
+                style={{ marginBottom: 12 }}
               />
-            </div>
-            <div className="property-row">
-              <label className="property-label">Color</label>
-              <input
-                type="color"
+              <Form.Label>Color</Form.Label>
+              <Input
                 value={element.data.style?.color || '#333333'}
-                onChange={(e) => handleDataChange('style', { ...element.data.style, color: e.target.value })}
-                className="property-color"
+                onChange={(value) => handleDataChange('style', { ...element.data.style, color: value })}
+                style={{ marginBottom: 12 }}
               />
-            </div>
-          </div>
-        )}
-        
-        {/* Shape-specific properties */}
-        {(element.type === 'rect' || element.type === 'circle') && (
-          <div className="property-section">
-            <div className="section-title">样式 / Style</div>
-            <div className="property-row">
-              <label className="property-label">Fill</label>
-              <input
-                type="color"
+            </Form.Section>
+          )}
+          
+          {/* Shape-specific properties */}
+          {(element.type === 'rect' || element.type === 'circle') && (
+            <Form.Section text="样式 / Style">
+              <Form.Label>Fill</Form.Label>
+              <Input
                 value={element.data.fill || '#e0e0e0'}
-                onChange={(e) => handleDataChange('fill', e.target.value)}
-                className="property-color"
+                onChange={(value) => handleDataChange('fill', value)}
+                style={{ marginBottom: 12 }}
               />
-            </div>
-            <div className="property-row">
-              <label className="property-label">Stroke</label>
-              <input
-                type="color"
+              <Form.Label>Stroke</Form.Label>
+              <Input
                 value={element.data.stroke || '#999999'}
-                onChange={(e) => handleDataChange('stroke', e.target.value)}
-                className="property-color"
+                onChange={(value) => handleDataChange('stroke', value)}
+                style={{ marginBottom: 12 }}
               />
-            </div>
-            <div className="property-row">
-              <label className="property-label">Stroke Width</label>
-              <input
-                type="number"
+              <Form.Label>Stroke Width</Form.Label>
+              <InputNumber
                 value={element.data.strokeWidth || 1}
-                onChange={(e) => handleDataChange('strokeWidth', Number(e.target.value))}
-                className="property-input"
+                onChange={(value) => handleDataChange('strokeWidth', Number(value))}
               />
-            </div>
-          </div>
-        )}
+            </Form.Section>
+          )}
+        </Form>
       </div>
-    </div>
+    </Card>
   )
 }

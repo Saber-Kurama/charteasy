@@ -1,29 +1,77 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Canvas } from '../components/Canvas/Canvas'
-import { LeftToolbar } from '../components/Toolbar/LeftToolbar'
-import { TopToolbar } from '../components/Toolbar/TopToolbar'
-import { ViewToolbar } from '../components/Toolbar/ViewToolbar'
-import { PropertyPanel } from '../components/Panel/PropertyPanel'
+import { PageBase } from '../components/Layout/PageBase'
+import { PageLoader } from '../components/Loader/PageLoader'
+import { VisualizationEditorPanel } from '../components/Editor/VisualizationEditorPanel'
 import { useCanvasStore } from '../store/canvasStore'
 import { useHistoryStore } from '../store/historyStore'
+import { useVisualizationStore } from '../store/visualizationStore'
 import './CanvasEditor.css'
 
 export function CanvasEditor() {
-  const { id } = useParams<{ id: string }>()
-  // Use id for canvas identification
-  // eslint-disable-next-line no-console
-  console.log('Canvas ID:', id)
-  const { elements, viewport, deselectAll } = useCanvasStore()
+  const { id = '' } = useParams<{ id: string }>()
+  const [isLoading, setIsLoading] = useState(true)
+  const [isReady, setIsReady] = useState(false)
+  
+  // Original editor: const { visualizations, updateVisualization } = useVisualizationStore()
+  const { visualizations, updateVisualization, addVisualization } = useVisualizationStore()
+  const { elements, viewport, deselectAll: _deselectAll, canvasWidth, canvasHeight, showGrid, gridSize } = useCanvasStore()
   const { saveState } = useHistoryStore()
   
-  // Save state when elements change (for undo/redo)
+  // Find current visualization (matching original: s = i.find(t => t.id === e))
+  const visualization = visualizations.find(v => v.id === id)
+  
+  // Load visualization data
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      saveState(elements, viewport)
+    // Simulate API loading (matching original editor behavior)
+    const timer = setTimeout(() => {
+      // If visualization doesn't exist, create a new one
+      if (!visualization && id) {
+        addVisualization({
+          id,
+          name: '未命名画布',
+          elements: [],
+          viewport: { zoom: 1, offsetX: 0, offsetY: 0 },
+          canvasWidth: 1920,
+          canvasHeight: 1080,
+          showGrid: true,
+          gridSize: 20,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        })
+      }
+      
+      setIsLoading(false)
+      // Trigger resize after content loads (matching original: window.dispatchEvent(new Event("resize")))
+      window.dispatchEvent(new Event('resize'))
+      setIsReady(true)
     }, 500)
+    
+    return () => clearTimeout(timer)
+  }, [id, visualization, addVisualization])
+  
+  // Sync canvas state to visualization store (matching original onUpdate behavior)
+  useEffect(() => {
+    if (!isReady || !id) return
+    
+    const timeoutId = setTimeout(() => {
+      // Save to history
+      saveState(elements, viewport)
+      
+      // Update visualization (matching original: updateVisualization(e, t))
+      updateVisualization(id, {
+        elements,
+        viewport,
+        canvasWidth,
+        canvasHeight,
+        showGrid,
+        gridSize,
+        updatedAt: Date.now(),
+      })
+    }, 500)
+    
     return () => clearTimeout(timeoutId)
-  }, [elements, viewport, saveState])
+  }, [elements, viewport, canvasWidth, canvasHeight, showGrid, gridSize, id, isReady, saveState, updateVisualization])
   
   // Keyboard shortcuts
   useEffect(() => {
@@ -32,16 +80,13 @@ export function CanvasEditor() {
         e.preventDefault()
         if (e.shiftKey) {
           // Ctrl+Shift+Z = Redo
-          // handleRedo would go here
         } else {
           // Ctrl+Z = Undo
-          // handleUndo would go here
         }
       }
       
       if (e.key === 'Delete' || e.key === 'Backspace') {
         // Delete selected elements
-        // handleDelete would go here
       }
     }
     
@@ -49,15 +94,29 @@ export function CanvasEditor() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
   
+  // Original editor structure uses PageBase with language and pageKey
+  // Matching: S = e => { const { language: t, children: i, pageKey: n } = e; ... }
   return (
-    <div className="canvas-editor">
-      <TopToolbar />
-      <LeftToolbar />
-      <ViewToolbar />
-      <div className="canvas-workspace" onClick={deselectAll}>
-        <Canvas />
+    <PageBase language="zh" pageKey="visualization">
+      <div className="visualization-page-container">
+        {isLoading && (
+          <div className="visualization-page-loader">
+            <PageLoader />
+            <span>加载中...</span>
+          </div>
+        )}
+        
+        {!isLoading && (
+          <VisualizationEditorPanel
+            language="zh"
+            visualizationId={id}
+            onReady={() => setIsReady(true)}
+            onUpdate={(data, dataVersion) => {
+              console.log('Visualization updated:', data, dataVersion)
+            }}
+          />
+        )}
       </div>
-      <PropertyPanel />
-    </div>
+    </PageBase>
   )
 }

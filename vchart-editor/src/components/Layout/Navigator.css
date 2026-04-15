@@ -1,0 +1,83 @@
+.navigator {
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+}
+
+.navigator-content {
+  height: 100%;
+  border-right: 1px solid var(--semi-color-border);
+}
+
+/* Logo styling */
+.navigator-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Header text styling matching screenshot */
+.navigator-header-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navigator-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--semi-color-text-0);
+}
+
+.navigator-beta-tag {
+  font-size: 10px !important;
+  padding: 0 4px !important;
+  height: 18px !important;
+  line-height: 18px !important;
+}
+
+/* Override Semi UI Nav styles */
+.semi-nav {
+  width: 200px;
+}
+
+.semi-nav-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--semi-color-border);
+}
+
+.semi-nav-list {
+  padding: 8px 0;
+}
+
+.semi-nav-item {
+  margin: 2px 8px;
+  border-radius: 6px;
+  height: 40px;
+  line-height: 40px;
+}
+
+.semi-nav-item:hover {
+  background-color: var(--semi-color-fill-0);
+}
+
+.semi-nav-item-selected {
+  background-color: var(--semi-color-primary-light-default) !important;
+  color: var(--semi-color-primary) !important;
+}
+
+.semi-nav-item-icon {
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.semi-nav-footer {
+  border-top: 1px solid var(--semi-color-border);
+}
+
+/* Collapse button styling */
+.semi-nav-collapse-btn {
+  color: var(--semi-color-text-2);
+}
