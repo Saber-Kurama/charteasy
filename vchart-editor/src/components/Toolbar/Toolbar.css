@@ -1,15 +1,16 @@
 /* Left Toolbar */
 .left-toolbar {
-  position: absolute;
-  left: 16px;
-  top: 80px;
+  position: fixed;
+  left: 0;
+  top: 56px;
+  bottom: 0;
+  width: 48px;
   display: flex;
   flex-direction: column;
   gap: 4px;
   background: #fff;
-  border-radius: 8px;
-  padding: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid #e8e8e8;
+  padding: 8px 4px;
   z-index: 100;
 }
 
@@ -145,16 +146,18 @@
 
 /* View Toolbar */
 .view-toolbar {
-  position: absolute;
-  top: 80px;
-  right: 16px;
+  position: fixed;
+  right: 280px;
+  bottom: 0;
+  left: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 16px;
   background: #fff;
-  border-radius: 8px;
+  border-top: 1px solid #e8e8e8;
   padding: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 100;
 }
 

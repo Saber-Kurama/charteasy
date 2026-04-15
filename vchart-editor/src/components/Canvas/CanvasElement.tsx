@@ -2,6 +2,7 @@ import { useRef, useState, useCallback, useEffect } from 'react'
 import type { CanvasElement as CanvasElementType } from '../../store/canvasStore'
 import { useCanvasStore } from '../../store/canvasStore'
 import { VChart } from '@visactor/react-vchart'
+import { ChartFloatingToolbar } from '../Chart/ChartFloatingToolbar'
 import './CanvasElement.css'
 
 interface CanvasElementProps {
@@ -12,22 +13,46 @@ interface CanvasElementProps {
 
 export function CanvasElement({ element, isSelected, onSelect }: CanvasElementProps) {
   const elementRef = useRef<HTMLDivElement>(null)
+  const chartRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [elementStart, setElementStart] = useState({ x: 0, y: 0 })
+  const [showToolbar, setShowToolbar] = useState(false)
+  const [toolbarPosition, setToolbarPosition] = useState({ x: 0, y: 0 })
   
-  const { updateElement, viewport } = useCanvasStore()
+  const { updateElement, viewport, selectChartDataItem } = useCanvasStore()
   
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     onSelect(e.shiftKey || e.metaKey || e.ctrlKey)
+    
+    // Show toolbar for chart elements when selected
+    if (element.type === 'chart') {
+      setShowToolbar(true)
+      setToolbarPosition({ x: element.width / 2, y: 0 })
+    }
     
     if (e.button === 0) {
       setIsDragging(true)
       setDragStart({ x: e.clientX, y: e.clientY })
       setElementStart({ x: element.x, y: element.y })
     }
-  }, [element.x, element.y, onSelect])
+  }, [element.x, element.y, element.width, element.type, onSelect])
+  
+  // Handle chart data item click
+  const handleChartClick = useCallback((params: unknown) => {
+    if (element.type !== 'chart') return
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const clickParams = params as any
+    if (clickParams && clickParams.datum) {
+      selectChartDataItem(element.id, {
+        seriesId: clickParams.seriesId || 'default',
+        dataIndex: clickParams.dataIndex || 0,
+        dataItem: clickParams.datum,
+      })
+    }
+  }, [element.id, element.type, selectChartDataItem])
   
   useEffect(() => {
     if (!isDragging) return
@@ -59,8 +84,27 @@ export function CanvasElement({ element, isSelected, onSelect }: CanvasElementPr
     switch (element.type) {
       case 'chart':
         return (
-          <div className="element-chart">
-            <VChart spec={element.data.spec} style={{ width: '100%', height: '100%' }} />
+          <div className="element-chart" ref={chartRef}>
+            <VChart 
+              spec={{
+                ...element.data.spec,
+                // Enable data item selection
+                interactions: [
+                  {
+                    type: 'element-select',
+                    trigger: 'click',
+                    style: {
+                      fill: '#1890ff',
+                      fillOpacity: 0.3,
+                      stroke: '#1890ff',
+                      strokeWidth: 2,
+                    },
+                  },
+                ],
+              }} 
+              style={{ width: '100%', height: '100%' }}
+              onClick={handleChartClick}
+            />
           </div>
         )
       case 'text':
@@ -126,6 +170,14 @@ export function CanvasElement({ element, isSelected, onSelect }: CanvasElementPr
       onMouseDown={handleMouseDown}
     >
       {renderContent()}
+      
+      {/* Floating toolbar for chart elements */}
+      {element.type === 'chart' && isSelected && showToolbar && (
+        <ChartFloatingToolbar 
+          elementId={element.id} 
+          position={toolbarPosition}
+        />
+      )}
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { Canvas } from '../components/Canvas/Canvas'
 import { LeftToolbar } from '../components/Toolbar/LeftToolbar'
 import { TopToolbar } from '../components/Toolbar/TopToolbar'
 import { ViewToolbar } from '../components/Toolbar/ViewToolbar'
+import { PropertyPanel } from '../components/Panel/PropertyPanel'
 import { useCanvasStore } from '../store/canvasStore'
 import { useHistoryStore } from '../store/historyStore'
 import './CanvasEditor.css'
@@ -56,6 +57,7 @@ export function CanvasEditor() {
       <div className="canvas-workspace" onClick={deselectAll}>
         <Canvas />
       </div>
+      <PropertyPanel />
     </div>
   )
 }

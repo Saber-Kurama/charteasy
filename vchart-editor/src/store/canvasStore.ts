@@ -1,7 +1,25 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-export type ElementType = 'chart' | 'text' | 'rect' | 'circle' | 'arrow' | 'image'
+export type ElementType = 'chart' | 'table' | 'text' | 'rect' | 'circle' | 'oval' | 'diamond' | 'callout' | 'straightLine' | 'elbowLine' | 'curveLine' | 'arrow' | 'image' | 'svg' | 'chartConnectorLine'
+
+export type EditorMode = 
+  | 'normal'           // 正常模式
+  | 'addTool'          // 添加工具模式
+  | 'editData'         // 编辑数据模式
+  | 'changeChart'      // 更改图表类型
+  | 'addMarkPoint'     // 添加标记点
+  | 'addAxisBreak'     // 添加坐标轴断点
+  | 'addChartConnector' // 添加图表连接线
+  | 'boxSelectionSelecting' // 框选模式
+  | 'multipleSelecting' // 多选模式
+  | 'none'             // 无模式
+
+export interface SelectedDataItem {
+  seriesId: string
+  dataIndex: number
+  dataItem: Record<string, unknown>
+}
 
 export interface CanvasElement {
   id: string
@@ -16,6 +34,12 @@ export interface CanvasElement {
   data: any
 }
 
+export interface ChartSelection {
+  elementId: string
+  dataItem?: SelectedDataItem
+  seriesId?: string
+}
+
 export interface ViewportState {
   zoom: number
   offsetX: number
@@ -26,6 +50,12 @@ interface CanvasState {
   // Elements
   elements: CanvasElement[]
   selectedIds: string[]
+  
+  // Chart Selection (for selecting data items within a chart)
+  chartSelection: ChartSelection | null
+  
+  // Editor Mode
+  mode: EditorMode
   
   // Viewport
   viewport: ViewportState
@@ -63,6 +93,14 @@ interface CanvasState {
   // Z-index
   bringToFront: (id: string) => void
   sendToBack: (id: string) => void
+  
+  // Mode
+  setMode: (mode: EditorMode) => void
+  
+  // Chart Selection
+  setChartSelection: (selection: ChartSelection | null) => void
+  selectChartDataItem: (elementId: string, dataItem: SelectedDataItem) => void
+  clearChartSelection: () => void
 }
 
 export const useCanvasStore = create<CanvasState>()(
@@ -215,6 +253,17 @@ export const useCanvasStore = create<CanvasState>()(
           }
         })
       },
+      
+      mode: 'normal' as EditorMode,
+      setMode: (mode) => set({ mode }),
+      
+      chartSelection: null,
+      setChartSelection: (selection) => set({ chartSelection: selection }),
+      selectChartDataItem: (elementId, dataItem) => set({
+        chartSelection: { elementId, dataItem },
+        selectedIds: [elementId],
+      }),
+      clearChartSelection: () => set({ chartSelection: null }),
     }),
     {
       name: 'vchart-canvas-storage',
