@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { VChart } from '@visactor/react-vchart'
 import { useVisualizationsStore } from '../store/visualizations'
 import { t, type Language } from '../i18n'
@@ -101,6 +101,10 @@ export function Editor() {
   const navigate = useNavigate()
   const { lang = 'zh', id } = useParams<{ lang: string; id?: string }>()
   const language = lang as Language
+  const location = useLocation()
+  
+  // Check if we're in visualization mode (canvas creation/editing)
+  const isVisualizationMode = location.pathname.includes('/visualization/')
   
   const { addVisualization, updateVisualization, getVisualization } = useVisualizationsStore()
   
@@ -175,8 +179,31 @@ export function Editor() {
     } else {
       addVisualization({ name: chartName, spec })
     }
+    
+    // Navigate back to home after saving
     navigate(`/${language}/app/home`)
   }
+  
+  // Auto-save for visualization mode (canvas creation)
+  useEffect(() => {
+    if (isVisualizationMode && id && chartName.trim()) {
+      // Auto-save when in visualization mode
+      const timeoutId = setTimeout(() => {
+        if (isEditMode) {
+          updateVisualization(id, { name: chartName, spec })
+        } else {
+          // For new visualization with specific ID, create it
+          const existing = getVisualization(id)
+          if (!existing) {
+            addVisualization({ name: chartName, spec })
+          } else {
+            updateVisualization(id, { name: chartName, spec })
+          }
+        }
+      }, 1000)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [chartName, spec, id, isVisualizationMode, isEditMode])
   
   const handleExport = () => {
     const dataStr = JSON.stringify(spec, null, 2)

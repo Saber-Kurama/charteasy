@@ -11,7 +11,7 @@ export function Navigator({ language }: NavigatorProps) {
   
   const getPageKey = () => {
     const path = location.pathname
-    if (path.includes('/new') || path.includes('/edit/')) return 'new'
+    if (path.includes('/new') || path.includes('/edit/') || path.includes('/visualization/')) return 'new'
     return 'home'
   }
   

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Navigator } from './components/Navigator'
 import { Home } from './pages/Home'
 import { Editor } from './pages/Editor'
+import { CanvasEditor } from './pages/CanvasEditor'
 import './App.css'
 
 function AppLayout({ children, lang }: { children: React.ReactNode; lang: string }) {
@@ -43,6 +44,10 @@ function App() {
               <Editor />
             </AppLayout>
           }
+        />
+        <Route
+          path="/:lang/app/visualization/:id"
+          element={<CanvasEditor />}
         />
       </Routes>
     </BrowserRouter>

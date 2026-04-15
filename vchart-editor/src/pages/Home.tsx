@@ -9,6 +9,20 @@ export function Home() {
   
   const { visualizations, deleteVisualization } = useVisualizationsStore()
   
+  // Generate a UUID for new visualization
+  const generateUUID = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0
+      const v = c === 'x' ? r : (r & 0x3 | 0x8)
+      return v.toString(16)
+    })
+  }
+  
+  const handleCreateNew = () => {
+    const newId = generateUUID()
+    navigate(`/${language}/app/visualization/${newId}`)
+  }
+  
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString(language === 'zh' ? 'zh-CN' : 'en-US')
   }
@@ -27,6 +41,9 @@ export function Home() {
     <div className="home-page">
       <div className="page-header">
         <h1>{t('home', language)}</h1>
+        <button className="btn btn-primary" onClick={handleCreateNew}>
+          + {t('new', language)}
+        </button>
       </div>
       
       {visualizations.length === 0 ? (
