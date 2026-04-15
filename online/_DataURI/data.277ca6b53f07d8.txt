@@ -1,0 +1,1 @@
+chrome-extension://pkgccpejnmalmdinmhkkfafefagiiiad/json-format/content-script.js

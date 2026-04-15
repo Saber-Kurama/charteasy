@@ -1,0 +1,12 @@
+node_modules/
+vchart-editor/node_modules/
+
+
+# misc
+.DS_Store
+*.pem
+
+# logs
+*.log
+
+# temp files
