@@ -1,10 +1,7 @@
 import { forwardRef, useEffect } from 'react'
 import { useCanvasStore } from '../../store/canvasStore'
-import { LeftToolbar } from '../Toolbar/LeftToolbar'
-import { TopToolbar } from '../Toolbar/TopToolbar'
-import { ViewToolbar } from '../Toolbar/ViewToolbar'
-import { Canvas } from '../Canvas/Canvas'
-import { PropertyPanel } from '../Panel/PropertyPanel'
+import { HeaderTools } from '../Toolbar/HeaderTools'
+import { ChartCanvas } from '../Canvas/ChartCanvas'
 import './EditApp.css'
 
 interface EditAppProps {
@@ -74,14 +71,14 @@ export const EditApp = forwardRef<EditorState, EditAppProps>(
       <div className="edit-app">
         {/* Original: (0, a.jsx)(QL, { handlers: i }) */}
         {/* QL - Top toolbar / Header */}
-        <TopToolbar />
+        <HeaderTools handlers={handlers} />
         
         {/* Original: (0, a.jsx)(AV, {}) */}
         {/* AV - AI Assistant or additional toolbar */}
         
         {/* Original: (0, a.jsx)(wL, { handlers: i }) */}
-        {/* wL - Left toolbar */}
-        <LeftToolbar />
+        {/* wL - ChartCanvas*/}
+        <ChartCanvas handlers={handlers} />
         
         {/* Editor content area */}
         {elements ? (
@@ -95,10 +92,8 @@ export const EditApp = forwardRef<EditorState, EditAppProps>(
             )}
             
             {/* Original: (0, a.jsx)(mV, {}) */}
-            {/* mV - Main canvas area */}
-            <div className="edit-app-canvas">
-              <Canvas />
-            </div>
+            {/* mV - area (wL component) */}
+            
             
             {/* Original: (0, a.jsx)(oG, {}) */}
             {/* oG - Overlay components */}
@@ -108,13 +103,13 @@ export const EditApp = forwardRef<EditorState, EditAppProps>(
             
             {/* Original: (0, a.jsx)(sG, { handlers: i }) */}
             {/* sG - Selection/Property panel */}
-            <PropertyPanel />
+            {/* <PropertyPanel /> */}
             
             {/* Original: (0, a.jsx)(_G, {}) */}
             {/* _G - Additional overlays */}
             
             {/* View toolbar */}
-            <ViewToolbar />
+            {/* <ViewToolbar /> */}
           </>
         ) : null}
         
